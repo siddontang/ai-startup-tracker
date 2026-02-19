@@ -42,8 +42,8 @@ export default function StartupDetail() {
           <p className="text-gray-400 mt-1">{startup.region} · {startup.country} · {startup.vertical}</p>
         </div>
         <div className="flex gap-2">
-          <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm">Relevance: {startup.relevance_score}</span>
-          {startup.outreach_status && <span className="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-sm">{startup.outreach_status}</span>}
+          {startup.stage && <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm">{startup.stage}</span>}
+          {startup.funding_amount && <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm">{startup.funding_amount}</span>}
         </div>
       </div>
 
@@ -57,7 +57,6 @@ export default function StartupDetail() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div><span className="text-gray-400">Stage:</span> <span className="ml-2">{startup.stage || '-'}</span></div>
               <div><span className="text-gray-400">Funding:</span> <span className="ml-2">{startup.funding_amount || '-'}</span></div>
-              <div><span className="text-gray-400">Needs DB:</span> <span className="ml-2">{startup.needs_database ? 'Yes' : 'No'}</span></div>
             </div>
             {startup.website && <a href={startup.website} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block">{startup.website}</a>}
           </div>
@@ -119,7 +118,7 @@ export default function StartupDetail() {
                       <div>
                         <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-medium">{c.title}</a>
                         {c.published_at && <p className="text-gray-500 text-xs mt-0.5">{new Date(c.published_at).toLocaleDateString()}</p>}
-                        {c.summary && <p className="text-gray-300 text-sm mt-1">{c.summary}</p>}
+                        {c.summary && <p className="text-gray-300 text-sm mt-1">{c.summary.replace(/<[^>]*>/g, '')}</p>}
                       </div>
                     </div>
                   </div>
