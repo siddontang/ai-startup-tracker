@@ -12,7 +12,7 @@ interface Startup {
   product: string; stage: string; funding_amount: string; needs_database: number; pain_points: string;
   relevance_score: number; outreach_status: string; tech_stack: string;
   linkedin: string; github: string; twitter: string; blog: string;
-  persons: Person[]; content: Content[]; products: Product[];
+  investors: string; persons: Person[]; content: Content[]; products: Product[];
 }
 
 const SocialLink = ({ href, label }: { href: string; label: string }) =>
