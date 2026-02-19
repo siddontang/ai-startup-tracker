@@ -87,7 +87,7 @@ export default function Dashboard() {
               <XAxis type="number" stroke="#9ca3af" fontSize={12} />
               <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={12} width={100} />
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} className="cursor-pointer" onClick={(_: unknown, index: number) => { const stage = stats.stages[index]?.stage; if (stage) router.push(`/startups?sort=stage&search=${encodeURIComponent(stage)}`); }}>
                 {stats.stages.map((_, i) => <Cell key={i} fill={STAGE_COLORS[i % STAGE_COLORS.length]} />)}
               </Bar>
             </BarChart>
