@@ -20,12 +20,14 @@ function StartupsContent() {
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [region, setRegion] = useState(searchParams.get('region') || '');
   const [vertical, setVertical] = useState(searchParams.get('vertical') || '');
+  const [stage, setStage] = useState(searchParams.get('stage') || '');
   const [needsDb, setNeedsDb] = useState(searchParams.get('needs_database') === 'true');
   const [sort, setSort] = useState(searchParams.get('sort') || 'discovered_at');
   const [order, setOrder] = useState(searchParams.get('order') || 'DESC');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
   const [regions, setRegions] = useState<string[]>([]);
   const [verticals, setVerticals] = useState<string[]>([]);
+  const [stages, setStages] = useState<string[]>([]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -33,6 +35,7 @@ function StartupsContent() {
     if (search) params.set('search', search);
     if (region) params.set('region', region);
     if (vertical) params.set('vertical', vertical);
+    if (stage) params.set('stage', stage);
     if (needsDb) params.set('needs_database', 'true');
     params.set('sort', sort);
     params.set('order', order);
@@ -42,7 +45,7 @@ function StartupsContent() {
     setData(json.data || []);
     setTotal(json.total || 0);
     setLoading(false);
-  }, [search, region, vertical, needsDb, sort, order, page]);
+  }, [search, region, vertical, stage, needsDb, sort, order, page]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -50,6 +53,7 @@ function StartupsContent() {
     fetch('/api/stats').then(r => r.json()).then(stats => {
       setRegions((stats.regions || []).map((r: { region: string }) => r.region));
       setVerticals((stats.verticals || []).map((v: { vertical: string }) => v.vertical));
+      setStages((stats.stages || []).map((s: { stage: string }) => s.stage));
     });
   }, []);
 
@@ -78,6 +82,11 @@ function StartupsContent() {
           className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm">
           <option value="">All Verticals</option>
           {verticals.map(v => <option key={v} value={v}>{v}</option>)}
+        </select>
+        <select value={stage} onChange={e => { setStage(e.target.value); setPage(1); }}
+          className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+          <option value="">All Stages</option>
+          {stages.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <label className="flex items-center gap-2 text-sm text-gray-400">
           <input type="checkbox" checked={needsDb} onChange={e => { setNeedsDb(e.target.checked); setPage(1); }}

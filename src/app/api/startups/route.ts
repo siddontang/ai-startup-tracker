@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const needsDb = searchParams.get('needs_database');
     const sort = searchParams.get('sort') || 'discovered_at';
     const order = searchParams.get('order') || 'DESC';
+    const stage = searchParams.get('stage') || '';
     const minRelevance = searchParams.get('min_relevance');
     const maxRelevance = searchParams.get('max_relevance');
 
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
     if (search) { conditions.push('name LIKE ?'); params.push(`%${search}%`); }
     if (region) { conditions.push('region = ?'); params.push(region); }
     if (vertical) { conditions.push('vertical = ?'); params.push(vertical); }
+    if (stage) { conditions.push('stage = ?'); params.push(stage); }
     if (needsDb === 'true') { conditions.push('needs_database = 1'); }
     if (minRelevance) { conditions.push('relevance_score >= ?'); params.push(Number(minRelevance)); }
     if (maxRelevance) { conditions.push('relevance_score <= ?'); params.push(Number(maxRelevance)); }
