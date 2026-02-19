@@ -62,7 +62,15 @@ export default function Dashboard() {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Startups by Region</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stats.regions}>
+            <BarChart data={(() => {
+              const top7 = stats.regions.slice(0, 7);
+              const others = stats.regions.slice(7);
+              if (others.length > 0) {
+                const otherCount = others.reduce((sum, r) => sum + r.count, 0);
+                return [...top7, { region: 'Others', count: otherCount }];
+              }
+              return top7;
+            })()}>
               <XAxis dataKey="region" stroke="#9ca3af" fontSize={12} />
               <YAxis stroke="#9ca3af" fontSize={12} />
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
