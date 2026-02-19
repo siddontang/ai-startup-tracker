@@ -41,14 +41,13 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           { label: 'Total Startups', value: stats.totalStartups },
           { label: 'APAC Startups', value: `${stats.apacCount} (${apacPercent}%)` },
           { label: 'Key People', value: stats.totalPersons },
           { label: 'News Articles', value: stats.totalNews },
-          { label: 'Need Database', value: `${stats.needsDatabase} (${dbPercent}%)` },
-          { label: 'Avg Relevance', value: stats.avgRelevance },
+          { label: 'Regions Covered', value: stats.regions.length },
         ].map(s => (
           <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
             <p className="text-gray-400 text-xs">{s.label}</p>

@@ -21,8 +21,7 @@ function StartupsContent() {
   const [region, setRegion] = useState(searchParams.get('region') || '');
   const [vertical, setVertical] = useState(searchParams.get('vertical') || '');
   const [stage, setStage] = useState(searchParams.get('stage') || '');
-  const [needsDb, setNeedsDb] = useState(searchParams.get('needs_database') === 'true');
-  const [sort, setSort] = useState(searchParams.get('sort') || 'discovered_at');
+  const [sort, setSort] = useState(searchParams.get('sort') || 'latest_news');
   const [order, setOrder] = useState(searchParams.get('order') || 'DESC');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
   const [regions, setRegions] = useState<string[]>([]);
@@ -36,7 +35,6 @@ function StartupsContent() {
     if (region) params.set('region', region);
     if (vertical) params.set('vertical', vertical);
     if (stage) params.set('stage', stage);
-    if (needsDb) params.set('needs_database', 'true');
     params.set('sort', sort);
     params.set('order', order);
     params.set('page', String(page));
@@ -45,7 +43,7 @@ function StartupsContent() {
     setData(json.data || []);
     setTotal(json.total || 0);
     setLoading(false);
-  }, [search, region, vertical, stage, needsDb, sort, order, page]);
+  }, [search, region, vertical, stage, sort, order, page]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -59,7 +57,7 @@ function StartupsContent() {
 
   const toggleSort = (col: string) => {
     if (sort === col) setOrder(o => o === 'ASC' ? 'DESC' : 'ASC');
-    else { setSort(col); setOrder('ASC'); }
+    else { setSort(col); setOrder('DESC'); }
     setPage(1);
   };
 
@@ -88,11 +86,6 @@ function StartupsContent() {
           <option value="">All Stages</option>
           {stages.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <label className="flex items-center gap-2 text-sm text-gray-400">
-          <input type="checkbox" checked={needsDb} onChange={e => { setNeedsDb(e.target.checked); setPage(1); }}
-            className="rounded" />
-          Needs Database
-        </label>
       </div>
 
       {/* Table */}
@@ -103,7 +96,7 @@ function StartupsContent() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-gray-400 border-b border-gray-800">
-                {[['name','Name'],['region','Region'],['vertical','Vertical'],['relevance_score','Relevance'],['stage','Stage'],['funding_amount','Funding'],['latest_news','Latest News']].map(([col, label]) => (
+                {[['name','Name'],['region','Region'],['vertical','Vertical'],['stage','Stage'],['funding_amount','Funding'],['latest_news','Latest News']].map(([col, label]) => (
                   <th key={col} className="text-left py-3 px-4 cursor-pointer hover:text-white" onClick={() => toggleSort(col)}>
                     {label}<SortIcon col={col} />
                   </th>
@@ -115,7 +108,6 @@ function StartupsContent() {
                     <td className="py-3 px-4"><Link href={`/startups/${s.id}`} className="text-blue-400 hover:underline">{s.name}</Link></td>
                     <td className="py-3 px-4">{s.region}</td>
                     <td className="py-3 px-4">{s.vertical}</td>
-                    <td className="py-3 px-4"><span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-xs">{s.relevance_score}</span></td>
                     <td className="py-3 px-4">{s.stage}</td>
                     <td className="py-3 px-4 text-gray-400">{s.funding_amount}</td>
                     <td className="py-3 px-4 text-gray-500 text-xs">{s.latest_news_at ? new Date(s.latest_news_at).toLocaleDateString() : '—'}</td>
