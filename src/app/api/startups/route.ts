@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const conditions: string[] = [];
     const params: unknown[] = [];
 
-    if (search) { conditions.push('(name LIKE ? OR product LIKE ? OR country LIKE ? OR vertical LIKE ?)'); params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`); }
+    if (search) { const s = search.toLowerCase(); conditions.push('(LOWER(name) LIKE ? OR LOWER(product) LIKE ? OR LOWER(country) LIKE ? OR LOWER(vertical) LIKE ?)'); params.push(`%${s}%`, `%${s}%`, `%${s}%`, `%${s}%`); }
     if (region) { conditions.push('region = ?'); params.push(region); }
     if (vertical) { conditions.push('vertical = ?'); params.push(vertical); }
     if (stage) { conditions.push('stage = ?'); params.push(stage); }
