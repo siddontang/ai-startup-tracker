@@ -34,7 +34,6 @@ export default function Dashboard() {
   if (!stats) return <div className="text-center py-20 text-red-400">Failed to load stats</div>;
 
   const dbPercent = stats.totalStartups ? Math.round((stats.needsDatabase / stats.totalStartups) * 100) : 0;
-  const apacPercent = stats.totalStartups ? Math.round((stats.apacCount / stats.totalStartups) * 100) : 0;
 
   return (
     <div className="space-y-8">
@@ -44,7 +43,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           { label: 'Total Startups', value: stats.totalStartups },
-          { label: 'APAC Startups', value: `${stats.apacCount} (${apacPercent}%)` },
+          { label: 'Regions Covered', value: stats.regions.length },
           { label: 'Key People', value: stats.totalPersons },
           { label: 'News Articles', value: stats.totalNews },
           { label: 'Regions Covered', value: stats.regions.length },
