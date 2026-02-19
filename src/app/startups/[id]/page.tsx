@@ -6,12 +6,13 @@ import { useParams } from 'next/navigation';
 
 interface Person { id: number; name: string; role: string; linkedin: string; github: string; twitter: string; email: string; }
 interface Content { id: number; content_type: string; title: string; url: string; summary: string; relevance_to_tidb: string; published_at: string; }
+interface Product { id: number; name: string; url: string; description: string; category: string; }
 interface Startup {
   id: number; name: string; website: string; region: string; country: string; vertical: string;
   product: string; stage: string; funding_amount: string; needs_database: number; pain_points: string;
   relevance_score: number; outreach_status: string; tech_stack: string;
   linkedin: string; github: string; twitter: string; blog: string;
-  persons: Person[]; content: Content[];
+  persons: Person[]; content: Content[]; products: Product[];
 }
 
 const SocialLink = ({ href, label }: { href: string; label: string }) =>
@@ -67,6 +68,24 @@ export default function StartupDetail() {
               <h2 className="text-lg font-semibold mb-3">Tech Stack</h2>
               <div className="flex flex-wrap gap-2">
                 {techStack.map(t => <span key={t} className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm">{t.trim()}</span>)}
+              </div>
+            </div>
+          )}
+
+          {/* Products */}
+          {startup.products?.length > 0 && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+              <h2 className="text-lg font-semibold mb-3">🛠️ Products</h2>
+              <div className="space-y-3">
+                {startup.products.map(p => (
+                  <div key={p.id} className="border-b border-gray-800/50 pb-3 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <a href={p.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-medium">{p.name}</a>
+                      {p.category && <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">{p.category}</span>}
+                    </div>
+                    {p.description && <p className="text-gray-300 text-sm mt-1">{p.description}</p>}
+                  </div>
+                ))}
               </div>
             </div>
           )}
