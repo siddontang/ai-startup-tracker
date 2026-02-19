@@ -16,11 +16,18 @@ export async function GET() {
     const stages = await query<{ stage: string; count: number }>(
       'SELECT stage, COUNT(*) as count FROM ai_startups WHERE stage IS NOT NULL GROUP BY stage ORDER BY count DESC'
     );
-    const topLeads = await query(
-      'SELECT id, name, country, vertical, relevance_score, funding_amount FROM ai_startups WHERE relevance_score >= 8 ORDER BY relevance_score DESC, funding_amount DESC LIMIT 10'
-    );
     const [needsDbCount] = await query<{ count: number }>('SELECT COUNT(*) as count FROM ai_startups WHERE needs_database = 1');
     const [totalPersons] = await query<{ count: number }>('SELECT COUNT(*) as count FROM key_persons');
+    const [totalNews] = await query<{ count: number }>('SELECT COUNT(*) as count FROM company_content');
+    const topFunded = await query(
+      `SELECT id, name, country, vertical, funding_amount, stage FROM ai_startups 
+       WHERE funding_amount IS NOT NULL AND funding_amount != '' AND funding_amount != 'N/A'
+       ORDER BY CAST(REGEXP_REPLACE(REPLACE(REPLACE(REPLACE(funding_amount, '$', ''), '+', ''), ',', ''), '[^0-9.]', '') AS DECIMAL(20,2)) DESC
+       LIMIT 10`
+    );
+    const apacCount = await query<{ count: number }>(
+      "SELECT COUNT(*) as count FROM ai_startups WHERE region IN ('CN','IN','JP','KR','SG','TH','ID','VN','MY','TW','HK','AU','PH')"
+    );
 
     return NextResponse.json({
       totalStartups: total.count,
@@ -28,9 +35,11 @@ export async function GET() {
       avgRelevance: Math.round((avg.avg || 0) * 10) / 10,
       verticals,
       stages,
-      topLeads,
       needsDatabase: needsDbCount.count,
       totalPersons: totalPersons.count,
+      totalNews: totalNews.count,
+      topFunded,
+      apacCount: apacCount[0].count,
     });
   } catch (error) {
     console.error('Stats error:', error);
