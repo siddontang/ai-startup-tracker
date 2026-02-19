@@ -23,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex gap-6">
                 <Link href="/" className="text-gray-300 hover:text-white transition">Dashboard</Link>
                 <Link href="/startups" className="text-gray-300 hover:text-white transition">Startups</Link>
+                <a href="https://tidbcloud.com/free-trial/?utm_source=sales_bdm&utm_medium=sales&utm_content=Siddon" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">⚡ TiDB Cloud</a>
               </div>
             </div>
           </div>
