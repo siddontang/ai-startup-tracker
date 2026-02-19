@@ -82,10 +82,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Startups by Stage</h2>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={400}>
             <BarChart data={stats.stages} layout="vertical">
               <XAxis type="number" stroke="#9ca3af" fontSize={12} />
-              <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={12} width={100} />
+              <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={11} width={80} interval={0} />
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
               <Bar dataKey="count" radius={[0, 4, 4, 0]} className="cursor-pointer" onClick={(_: unknown, index: number) => { const stage = stats.stages[index]?.stage; if (stage) router.push(`/startups?stage=${encodeURIComponent(stage)}`); }}>
                 {stats.stages.map((_, i) => <Cell key={i} fill={STAGE_COLORS[i % STAGE_COLORS.length]} />)}
