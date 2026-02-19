@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 
 interface Startup {
   id: number; name: string; website: string; region: string; country: string; vertical: string;
-  product: string; stage: string; funding_amount: string; needs_database: number;
+  product: string; stage: string; funding_amount: string; needs_database: number; latest_news_at: string;
   relevance_score: number; outreach_status: string; discovered_at: string;
 }
 
@@ -103,7 +103,7 @@ function StartupsContent() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-gray-400 border-b border-gray-800">
-                {[['name','Name'],['region','Region'],['vertical','Vertical'],['relevance_score','Relevance'],['stage','Stage'],['funding_amount','Funding']].map(([col, label]) => (
+                {[['name','Name'],['region','Region'],['vertical','Vertical'],['relevance_score','Relevance'],['stage','Stage'],['funding_amount','Funding'],['latest_news','Latest News']].map(([col, label]) => (
                   <th key={col} className="text-left py-3 px-4 cursor-pointer hover:text-white" onClick={() => toggleSort(col)}>
                     {label}<SortIcon col={col} />
                   </th>
@@ -118,6 +118,7 @@ function StartupsContent() {
                     <td className="py-3 px-4"><span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-xs">{s.relevance_score}</span></td>
                     <td className="py-3 px-4">{s.stage}</td>
                     <td className="py-3 px-4 text-gray-400">{s.funding_amount}</td>
+                    <td className="py-3 px-4 text-gray-500 text-xs">{s.latest_news_at ? new Date(s.latest_news_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 ))}
               </tbody>

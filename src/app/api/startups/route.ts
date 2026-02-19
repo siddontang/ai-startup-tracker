@@ -21,23 +21,43 @@ export async function GET(request: NextRequest) {
     const conditions: string[] = [];
     const params: unknown[] = [];
 
-    if (search) { const s = search.toLowerCase(); conditions.push('(LOWER(name) LIKE ? OR LOWER(product) LIKE ? OR LOWER(country) LIKE ? OR LOWER(vertical) LIKE ?)'); params.push(`%${s}%`, `%${s}%`, `%${s}%`, `%${s}%`); }
-    if (region) { conditions.push('region = ?'); params.push(region); }
-    if (vertical) { conditions.push('vertical = ?'); params.push(vertical); }
-    if (stage) { conditions.push('stage = ?'); params.push(stage); }
-    if (needsDb === 'true') { conditions.push('needs_database = 1'); }
-    if (minRelevance) { conditions.push('relevance_score >= ?'); params.push(Number(minRelevance)); }
-    if (maxRelevance) { conditions.push('relevance_score <= ?'); params.push(Number(maxRelevance)); }
+    if (search) { const s = search.toLowerCase(); conditions.push('(LOWER(s.name) LIKE ? OR LOWER(s.product) LIKE ? OR LOWER(s.country) LIKE ? OR LOWER(s.vertical) LIKE ?)'); params.push(`%${s}%`, `%${s}%`, `%${s}%`, `%${s}%`); }
+    if (region) { conditions.push('s.region = ?'); params.push(region); }
+    if (vertical) { conditions.push('s.vertical = ?'); params.push(vertical); }
+    if (stage) { conditions.push('s.stage = ?'); params.push(stage); }
+    if (needsDb === 'true') { conditions.push('s.needs_database = 1'); }
+    if (minRelevance) { conditions.push('s.relevance_score >= ?'); params.push(Number(minRelevance)); }
+    if (maxRelevance) { conditions.push('s.relevance_score <= ?'); params.push(Number(maxRelevance)); }
 
     const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
-    const allowedSorts = ['name', 'region', 'vertical', 'relevance_score', 'stage', 'discovered_at'];
-    const sortCol = allowedSorts.includes(sort) ? sort : 'discovered_at';
+
+    const allowedSorts: Record<string, string> = {
+      'name': 's.name',
+      'region': 's.region',
+      'vertical': 's.vertical',
+      'relevance_score': 's.relevance_score',
+      'stage': 's.stage',
+      'discovered_at': 's.discovered_at',
+      'funding_amount': 's.funding_amount',
+      'latest_news': 'latest_news_at',
+      'updated_at': 's.updated_at',
+    };
+    const sortCol = allowedSorts[sort] || 's.discovered_at';
     const sortOrder = order === 'ASC' ? 'ASC' : 'DESC';
     const offset = (page - 1) * limit;
 
-    const [countResult] = await query<{ count: number }>(`SELECT COUNT(*) as count FROM ai_startups ${where}`, params);
+    const [countResult] = await query<{ count: number }>(
+      `SELECT COUNT(*) as count FROM ai_startups s ${where}`, params
+    );
+
     const rows = await query(
-      `SELECT * FROM ai_startups ${where} ORDER BY ${sortCol} ${sortOrder} LIMIT ? OFFSET ?`,
+      `SELECT s.*, MAX(c.published_at) as latest_news_at
+       FROM ai_startups s
+       LEFT JOIN company_content c ON s.name = c.startup_name
+       ${where}
+       GROUP BY s.id
+       ORDER BY ${sortCol} ${sortOrder}
+       LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
 
