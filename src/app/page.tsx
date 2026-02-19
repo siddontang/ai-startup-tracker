@@ -38,7 +38,7 @@ export default function Dashboard() {
           { label: 'Total Startups', value: stats.totalStartups, color: 'blue' },
           { label: 'Regions', value: stats.regions.length, color: 'purple' },
           { label: 'Avg Relevance', value: stats.avgRelevance, color: 'indigo' },
-          { label: 'New This Week', value: stats.newThisWeek, color: 'violet' },
+          { label: 'Verticals', value: stats.verticals?.length || 0, color: 'violet' },
         ].map(s => (
           <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <p className="text-gray-400 text-sm">{s.label}</p>
