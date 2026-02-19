@@ -5,8 +5,13 @@ let pool: mysql.Pool | null = null;
 export function getPool() {
   if (!pool) {
     const url = process.env.DATABASE_URL!;
+    const parsed = new URL(url);
     pool = mysql.createPool({
-      uri: url,
+      host: parsed.hostname,
+      port: parseInt(parsed.port || '4000'),
+      user: decodeURIComponent(parsed.username),
+      password: decodeURIComponent(parsed.password),
+      database: parsed.pathname.slice(1),
       ssl: { rejectUnauthorized: false },
       waitForConnections: true,
       connectionLimit: 5,
