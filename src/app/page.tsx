@@ -9,12 +9,15 @@ interface Stats {
   totalStartups: number;
   regions: { region: string; count: number }[];
   avgRelevance: number;
-  newThisWeek: number;
   verticals: { vertical: string; count: number }[];
-  recent: { id: number; name: string; region: string; vertical: string; relevance_score: number; discovered_at: string }[];
+  stages: { stage: string; count: number }[];
+  topLeads: { id: number; name: string; country: string; vertical: string; relevance_score: number; funding_amount: string }[];
+  needsDatabase: number;
+  totalPersons: number;
 }
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#6366f1', '#a78bfa', '#60a5fa', '#818cf8', '#c084fc', '#93c5fd'];
+const STAGE_COLORS = ['#10b981', '#34d399', '#6ee7b7', '#3b82f6', '#60a5fa', '#8b5cf6', '#a78bfa', '#f59e0b'];
 
 export default function Dashboard() {
   const router = useRouter();
@@ -28,6 +31,8 @@ export default function Dashboard() {
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>;
   if (!stats) return <div className="text-center py-20 text-red-400">Failed to load stats</div>;
 
+  const dbPercent = stats.totalStartups ? Math.round((stats.needsDatabase / stats.totalStartups) * 100) : 0;
+
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -35,10 +40,10 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Startups', value: stats.totalStartups, color: 'blue' },
-          { label: 'Regions', value: stats.regions.length, color: 'purple' },
-          { label: 'Avg Relevance', value: stats.avgRelevance, color: 'indigo' },
-          { label: 'Verticals', value: stats.verticals?.length || 0, color: 'violet' },
+          { label: 'Total Startups', value: stats.totalStartups },
+          { label: 'Key People Tracked', value: stats.totalPersons },
+          { label: 'Need Database', value: `${stats.needsDatabase} (${dbPercent}%)` },
+          { label: 'Avg Relevance', value: stats.avgRelevance },
         ].map(s => (
           <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <p className="text-gray-400 text-sm">{s.label}</p>
@@ -47,7 +52,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Charts */}
+      {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Startups by Region</h2>
@@ -73,26 +78,39 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-        <h2 className="text-lg font-semibold mb-4">Recent Additions</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead><tr className="text-gray-400 border-b border-gray-800">
-              <th className="text-left py-2">Name</th><th className="text-left py-2">Region</th><th className="text-left py-2">Vertical</th><th className="text-left py-2">Relevance</th><th className="text-left py-2">Added</th>
-            </tr></thead>
-            <tbody>
-              {stats.recent.map(s => (
-                <tr key={s.id} className="border-b border-gray-800/50 hover:bg-gray-800/50">
-                  <td className="py-2"><Link href={`/startups/${s.id}`} className="text-blue-400 hover:underline">{s.name}</Link></td>
-                  <td className="py-2">{s.region}</td>
-                  <td className="py-2">{s.vertical}</td>
-                  <td className="py-2"><span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-xs">{s.relevance_score}</span></td>
-                  <td className="py-2 text-gray-400">{s.discovered_at ? new Date(s.discovered_at).toLocaleDateString() : '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Charts Row 2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4">Startups by Stage</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={stats.stages} layout="vertical">
+              <XAxis type="number" stroke="#9ca3af" fontSize={12} />
+              <YAxis type="category" dataKey="stage" stroke="#9ca3af" fontSize={12} width={100} />
+              <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                {stats.stages.map((_, i) => <Cell key={i} fill={STAGE_COLORS[i % STAGE_COLORS.length]} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Top Leads */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4">🔥 Top Leads for TiDB</h2>
+          <div className="space-y-2">
+            {stats.topLeads.map(s => (
+              <Link key={s.id} href={`/startups/${s.id}`} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-800/50 transition group">
+                <div className="flex items-center gap-3">
+                  <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-xs font-bold">{s.relevance_score}</span>
+                  <div>
+                    <p className="text-sm font-medium group-hover:text-blue-400 transition">{s.name}</p>
+                    <p className="text-xs text-gray-500">{s.country} · {s.vertical}</p>
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400">{s.funding_amount}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
