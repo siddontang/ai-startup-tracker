@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Stats {
@@ -16,6 +17,7 @@ interface Stats {
 const COLORS = ['#3b82f6', '#8b5cf6', '#6366f1', '#a78bfa', '#60a5fa', '#818cf8', '#c084fc', '#93c5fd'];
 
 export default function Dashboard() {
+  const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ export default function Dashboard() {
               <XAxis dataKey="region" stroke="#9ca3af" fontSize={12} />
               <YAxis stroke="#9ca3af" fontSize={12} />
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
-              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} className="cursor-pointer" onClick={(_: unknown, index: number) => { const region = stats.regions[index]?.region; if (region) router.push(`/startups?region=${encodeURIComponent(region)}`); }} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -62,7 +64,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold mb-4">Startups by Vertical</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={stats.verticals.slice(0, 8)} dataKey="count" nameKey="vertical" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name} (${value})`} labelLine={false} fontSize={11}>
+              <Pie data={stats.verticals.slice(0, 8)} dataKey="count" nameKey="vertical" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name} (${value})`} labelLine={false} fontSize={11} className="cursor-pointer" onClick={(_: unknown, index: number) => { const vertical = stats.verticals[index]?.vertical; if (vertical) router.push(`/startups?vertical=${encodeURIComponent(vertical)}`); }}>
                 {stats.verticals.slice(0, 8).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
