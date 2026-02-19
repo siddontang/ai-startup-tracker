@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="alternate" type="application/rss+xml" title="AI Startup Tracker RSS" href="/api/rss" />
+      </head>
       <body className={`${inter.className} bg-gray-950 text-gray-100 min-h-screen`}>
         <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex gap-6">
                 <Link href="/" className="text-gray-300 hover:text-white transition">Dashboard</Link>
                 <Link href="/startups" className="text-gray-300 hover:text-white transition">Startups</Link>
+                <a href="/api/rss" target="_blank" className="text-orange-400 hover:text-orange-300 transition text-sm font-medium">📡 RSS</a>
                 <a href="https://tidbcloud.com/free-trial/?utm_source=sales_bdm&utm_medium=sales&utm_content=Siddon" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">⚡ TiDB Cloud</a>
               </div>
             </div>
