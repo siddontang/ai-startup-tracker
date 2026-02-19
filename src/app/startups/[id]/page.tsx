@@ -72,6 +72,18 @@ export default function StartupDetail() {
             </div>
           )}
 
+          {/* Investors */}
+          {startup.investors && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+              <h2 className="text-lg font-semibold mb-3">🏦 Investors</h2>
+              <div className="flex flex-wrap gap-2">
+                {startup.investors.split(',').map((inv: string, i: number) => (
+                  <span key={i} className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm">{inv.trim()}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Products */}
           {startup.products?.length > 0 && (
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
