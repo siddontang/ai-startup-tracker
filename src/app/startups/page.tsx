@@ -94,22 +94,21 @@ function StartupsContent() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-gray-400 border-b border-gray-800">
-                {[['name','Name'],['region','Region'],['vertical','Vertical'],['relevance_score','Relevance'],['stage','Stage']].map(([col, label]) => (
+                {[['name','Name'],['country','Region'],['vertical','Vertical'],['relevance_score','Relevance'],['stage','Stage'],['funding_amount','Funding']].map(([col, label]) => (
                   <th key={col} className="text-left py-3 px-4 cursor-pointer hover:text-white" onClick={() => toggleSort(col)}>
                     {label}<SortIcon col={col} />
                   </th>
                 ))}
-                <th className="text-left py-3 px-4">Country</th>
               </tr></thead>
               <tbody>
                 {data.map(s => (
                   <tr key={s.id} className="border-b border-gray-800/50 hover:bg-gray-800/50 cursor-pointer" onClick={() => router.push(`/startups/${s.id}`)}>
                     <td className="py-3 px-4"><Link href={`/startups/${s.id}`} className="text-blue-400 hover:underline">{s.name}</Link></td>
-                    <td className="py-3 px-4">{s.region}</td>
+                    <td className="py-3 px-4">{s.country}</td>
                     <td className="py-3 px-4">{s.vertical}</td>
                     <td className="py-3 px-4"><span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-xs">{s.relevance_score}</span></td>
                     <td className="py-3 px-4">{s.stage}</td>
-                    <td className="py-3 px-4 text-gray-400">{s.country}</td>
+                    <td className="py-3 px-4 text-gray-400">{s.funding_amount}</td>
                   </tr>
                 ))}
               </tbody>
