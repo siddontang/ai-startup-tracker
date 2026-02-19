@@ -71,21 +71,33 @@ export default function StartupDetail() {
             </div>
           )}
 
-          {/* Content */}
-          {startup.content?.length > 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <h2 className="text-lg font-semibold mb-3">Related Content</h2>
-              <div className="space-y-3">
+          {/* Latest News & Content */}
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <h2 className="text-lg font-semibold mb-3">📰 Latest News & Updates</h2>
+            {startup.content?.length > 0 ? (
+              <div className="space-y-4">
                 {startup.content.map(c => (
-                  <div key={c.id} className="border-b border-gray-800/50 pb-3 last:border-0">
-                    <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-medium">{c.title}</a>
-                    <p className="text-gray-400 text-sm mt-1">{c.content_type} · {c.published_at ? new Date(c.published_at).toLocaleDateString() : ''}</p>
-                    {c.summary && <p className="text-gray-300 text-sm mt-1">{c.summary}</p>}
+                  <div key={c.id} className="border-b border-gray-800/50 pb-4 last:border-0">
+                    <div className="flex items-start gap-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full mt-1 shrink-0 ${
+                        c.content_type === 'funding' ? 'bg-green-500/20 text-green-400' :
+                        c.content_type === 'launch' ? 'bg-blue-500/20 text-blue-400' :
+                        c.content_type === 'partnership' ? 'bg-purple-500/20 text-purple-400' :
+                        'bg-gray-700 text-gray-300'
+                      }`}>{c.content_type}</span>
+                      <div>
+                        <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-medium">{c.title}</a>
+                        {c.published_at && <p className="text-gray-500 text-xs mt-0.5">{new Date(c.published_at).toLocaleDateString()}</p>}
+                        {c.summary && <p className="text-gray-300 text-sm mt-1">{c.summary}</p>}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-gray-500 text-sm">No news collected yet.</p>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">
