@@ -25,9 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </div>
             <SuggestWidget />
-            <footer className="border-t border-gray-800 mt-8 py-6 text-center">
-              <a href="https://tidbcloud.com/free-trial/?utm_source=sales_bdm&utm_medium=sales&utm_content=Siddon" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-300 text-xs transition">
-                ⚡ Powered by TiDB Cloud
+            <footer className="border-t border-gray-800 mt-12 py-8 text-center">
+              <a href="https://tidbcloud.com/free-trial/?utm_source=sales_bdm&utm_medium=sales&utm_content=Siddon" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-6 py-3 rounded-xl text-base font-semibold transition shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40">
+                ⚡ Powered by TiDB Cloud — Try Free
               </a>
             </footer>
           </main>
