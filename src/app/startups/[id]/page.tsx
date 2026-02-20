@@ -34,7 +34,15 @@ export default function StartupDetail() {
 
   return (
     <div className="space-y-8">
-      <Link href="/startups" className="text-gray-400 hover:text-white text-sm">← Back to Startups</Link>
+      <div className="flex justify-between items-center">
+        <Link href="/startups" className="text-gray-400 hover:text-white text-sm">← Back to Startups</Link>
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('suggest-startup', { detail: { type: 'correction', startupName: startup.name, startupId: startup.id } }))}
+          className="text-gray-500 hover:text-yellow-400 text-xs transition"
+        >
+          ✏️ Report incorrect info
+        </button>
+      </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
