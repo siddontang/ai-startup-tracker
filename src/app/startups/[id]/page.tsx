@@ -36,12 +36,30 @@ export default function StartupDetail() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <Link href="/startups" className="text-gray-400 hover:text-white text-sm">← Back to Startups</Link>
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent('suggest-startup', { detail: { type: 'correction', startupName: startup.name, startupId: startup.id } }))}
-          className="text-gray-500 hover:text-yellow-400 text-xs transition"
-        >
-          ✏️ Report incorrect info
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              const btn = document.getElementById('flag-btn');
+              if (btn) btn.textContent = 'Submitting...';
+              try {
+                const res = await fetch('/api/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ startup_id: startup.id, startup_name: startup.name }) });
+                const data = await res.json();
+                if (btn) { btn.textContent = '✅ Flagged!'; btn.classList.add('text-green-400'); }
+                setTimeout(() => { if (btn) { btn.textContent = '🔍 Verify & Fix Info'; btn.classList.remove('text-green-400'); } }, 3000);
+              } catch { if (btn) btn.textContent = '❌ Failed'; }
+            }}
+            id="flag-btn"
+            className="bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 border border-yellow-600/40 px-3 py-1.5 rounded-lg text-xs font-medium transition"
+          >
+            🔍 Verify & Fix Info
+          </button>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('suggest-startup', { detail: { type: 'correction', startupName: startup.name, startupId: startup.id } }))}
+            className="text-gray-500 hover:text-blue-400 text-xs transition border border-gray-700 px-3 py-1.5 rounded-lg"
+          >
+            ✏️ Report Details
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
