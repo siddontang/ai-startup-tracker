@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { getCached, setCache } from '@/lib/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,13 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, parseInt(params.get('page') || '1'));
     const limit = Math.min(100, Math.max(1, parseInt(params.get('limit') || '50')));
     const offset = (page - 1) * limit;
+
+    const refresh = params.get('refresh') === 'true';
+    const cacheKey = `people:${params.toString()}`;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) return NextResponse.json(cached);
+    }
 
     const allowedSorts: Record<string, string> = {
       name: 'kp.name',
@@ -41,7 +49,9 @@ export async function GET(req: NextRequest) {
 
     const data = await query(dataSql, vals);
 
-    return NextResponse.json({ data, total: countRow.count });
+    const result = { data, total: countRow.count };
+    setCache(cacheKey, result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('People API error:', error);
     return NextResponse.json({ error: 'Failed to fetch people' }, { status: 500 });

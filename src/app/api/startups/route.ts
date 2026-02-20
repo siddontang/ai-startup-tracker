@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { getCached, setCache } from '@/lib/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -6,6 +7,12 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
+    const refresh = searchParams.get('refresh') === 'true';
+    const cacheKey = `startups:${searchParams.toString()}`;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) return NextResponse.json(cached);
+    }
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const search = searchParams.get('search') || '';
@@ -61,7 +68,9 @@ export async function GET(request: NextRequest) {
       [...params, limit, offset]
     );
 
-    return NextResponse.json({ data: rows, total: countResult.count, page, limit });
+    const result = { data: rows, total: countResult.count, page, limit };
+    setCache(cacheKey, result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Startups error:', error);
     return NextResponse.json({ error: 'Failed to fetch startups' }, { status: 500 });

@@ -1,10 +1,19 @@
 import { query } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { getCached, setCache } from '@/lib/cache';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
+    const cacheKey = 'stats';
+
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) return NextResponse.json(cached);
+    }
+
     const [total] = await query<{ count: number }>('SELECT COUNT(*) as count FROM ai_startups');
     const regions = await query<{ region: string; count: number }>(
       'SELECT region, COUNT(*) as count FROM ai_startups GROUP BY region ORDER BY count DESC'
@@ -25,7 +34,6 @@ export async function GET() {
        ORDER BY CAST(REGEXP_REPLACE(REPLACE(REPLACE(REPLACE(funding_amount, '$', ''), '+', ''), ',', ''), '[^0-9.]', '') AS DECIMAL(20,2)) DESC
        LIMIT 10`
     );
-    // Count unique VCs by parsing comma-separated investors
     const investorRows = await query<{ investors: string }>(
       'SELECT investors FROM ai_startups WHERE investors IS NOT NULL AND investors != \'\''
     );
@@ -34,11 +42,7 @@ export async function GET() {
       row.investors.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(v => vcSet.add(v));
     }
 
-    const apacCount = await query<{ count: number }>(
-      "SELECT COUNT(*) as count FROM ai_startups WHERE region IN ('CN','IN','JP','KR','SG','TH','ID','VN','MY','TW','HK','AU','PH')"
-    );
-
-    return NextResponse.json({
+    const result = {
       totalStartups: total.count,
       regions,
       avgRelevance: Math.round((avg.avg || 0) * 10) / 10,
@@ -48,9 +52,11 @@ export async function GET() {
       totalPersons: totalPersons.count,
       totalNews: totalNews.count,
       topFunded,
-      apacCount: apacCount[0].count,
       totalVCs: vcSet.size,
-    });
+    };
+
+    setCache(cacheKey, result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Stats error:', error);
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });

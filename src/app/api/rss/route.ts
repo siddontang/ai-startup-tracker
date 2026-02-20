@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { getCached, setCache } from '@/lib/cache';
 import { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,12 @@ export async function GET(request: NextRequest) {
   const stage = searchParams.get('stage') || '';
   const minRelevance = searchParams.get('min_relevance') || '';
   const needsDb = searchParams.get('needs_database') || '';
+  const refresh = searchParams.get('refresh') === 'true';
+  const rssCacheKey = `rss:${searchParams.toString()}`;
+  if (!refresh) {
+    const cached = getCached<string>(rssCacheKey);
+    if (cached) return new Response(cached, { headers: { 'Content-Type': 'application/rss+xml; charset=utf-8', 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' } });
+  }
   const sortBy = searchParams.get('sort') || 'latest_news'; // latest_news | updated_at | discovered_at | relevance
   const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 200);
 
@@ -123,6 +130,7 @@ ${items}
   </channel>
 </rss>`;
 
+  setCache(rssCacheKey, xml);
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',

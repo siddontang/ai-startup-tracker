@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { getCached, setCache } from '@/lib/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -6,6 +7,12 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     const search = req.nextUrl.searchParams.get('search') || '';
+    const refresh = req.nextUrl.searchParams.get('refresh') === 'true';
+    const cacheKey = `vcs:${search}`;
+    if (!refresh) {
+      const cached = getCached(cacheKey);
+      if (cached) return NextResponse.json(cached);
+    }
 
     const rows = await query<{ id: number; name: string; investors: string }>(
       'SELECT id, name, investors FROM ai_startups WHERE investors IS NOT NULL AND investors != \'\''
@@ -37,7 +44,9 @@ export async function GET(req: NextRequest) {
 
     vcs.sort((a, b) => b.count - a.count);
 
-    return NextResponse.json({ data: vcs, total: vcs.length });
+    const result = { data: vcs, total: vcs.length };
+    setCache(cacheKey, result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('VCs API error:', error);
     return NextResponse.json({ error: 'Failed to fetch VCs' }, { status: 500 });
