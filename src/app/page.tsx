@@ -42,16 +42,16 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
-          { label: 'Total Startups', value: stats.totalStartups },
-          { label: 'Regions Covered', value: stats.regions.length },
-          { label: 'Key People', value: stats.totalPersons },
-          { label: 'News Articles', value: stats.totalNews },
-          { label: 'Regions Covered', value: stats.regions.length },
+          { label: 'Total Startups', value: stats.totalStartups, href: '/startups' },
+          { label: 'Regions Covered', value: stats.regions.length, href: '/startups' },
+          { label: 'Key People', value: stats.totalPersons, href: '/startups' },
+          { label: 'News Articles', value: stats.totalNews, href: '/startups?sort=latest_news&order=DESC' },
+          { label: 'Top Funded', value: stats.topFunded.length, href: '/startups?sort=funding_amount&order=DESC' },
         ].map(s => (
-          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <Link key={s.label} href={s.href} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition cursor-pointer">
             <p className="text-gray-400 text-xs">{s.label}</p>
             <p className="text-2xl font-bold mt-1 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{s.value}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
