@@ -117,6 +117,19 @@ function StartupsContent() {
             </table>
           </div>
 
+          {/* No results - suggest */}
+          {data.length === 0 && search && (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-3">No startups found for &quot;{search}&quot;</p>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('suggest-startup', { detail: { name: search } }))}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              >
+                💡 Suggest &quot;{search}&quot; as a new startup
+              </button>
+            </div>
+          )}
+
           {/* Pagination */}
           <div className="flex justify-between items-center text-sm text-gray-400">
             <span>Showing {data.length} of {total}</span>

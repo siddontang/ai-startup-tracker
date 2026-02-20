@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function SuggestWidget() {
   const [open, setOpen] = useState(false);
@@ -9,6 +9,16 @@ export default function SuggestWidget() {
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+
+  // Listen for external open events (e.g. from startups page when 0 results)
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      setName(e.detail?.name || '');
+      setOpen(true);
+    };
+    window.addEventListener('suggest-startup', handler as EventListener);
+    return () => window.removeEventListener('suggest-startup', handler as EventListener);
+  }, []);
 
   const submit = async () => {
     if (!name.trim()) return;
@@ -40,7 +50,6 @@ export default function SuggestWidget() {
 
   return (
     <>
-      {/* Floating Button */}
       <button
         onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-transform hover:scale-110"
@@ -49,9 +58,8 @@ export default function SuggestWidget() {
         {open ? '✕' : '💡'}
       </button>
 
-      {/* Popup */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-5 space-y-3 animate-in">
+        <div className="fixed bottom-24 right-6 z-50 w-80 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-5 space-y-3">
           <h3 className="text-lg font-semibold text-white">🚀 Suggest a Startup</h3>
           <p className="text-gray-400 text-xs">Can&apos;t find a company? Let us know and we&apos;ll add it!</p>
           
