@@ -37,7 +37,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <SuggestWidget />
-        <footer className="border-t border-gray-800 mt-12 py-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap justify-center gap-4 pt-8 pb-4">
+            {[
+              { label: '🔍 Browse All Startups', href: '/startups' },
+              { label: '👥 Key People', href: '/people' },
+              { label: '🏦 VCs & Investors', href: '/vcs' },
+              { label: '📡 RSS Feed', href: '/api/rss' },
+            ].map(link => (
+              <Link key={link.label} href={link.href} className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 text-gray-300 hover:text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <footer className="border-t border-gray-800 mt-4 py-6 text-center">
           <a href="https://tidbcloud.com/free-trial/?utm_source=sales_bdm&utm_medium=sales&utm_content=Siddon" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
             ⚡ Powered by TiDB Cloud — Try Free
           </a>
