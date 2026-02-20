@@ -16,6 +16,7 @@ interface Stats {
   totalNews: number;
   topFunded: { id: number; name: string; country: string; vertical: string; funding_amount: string; stage: string }[];
   apacCount: number;
+  totalVCs: number;
 }
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#6366f1', '#a78bfa', '#60a5fa', '#818cf8', '#c084fc', '#93c5fd'];
@@ -40,13 +41,12 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: 'Total Startups', value: stats.totalStartups, href: '/startups' },
           { label: 'Regions Covered', value: stats.regions.length, href: '/startups' },
-          { label: 'Key People', value: stats.totalPersons, href: '/startups' },
-          { label: 'News Articles', value: stats.totalNews, href: '/startups?sort=latest_news&order=DESC' },
-          { label: 'Top Funded', value: stats.topFunded.length, href: '/startups?sort=funding_amount&order=DESC' },
+          { label: 'Key People', value: stats.totalPersons, href: '/people' },
+          { label: 'Top VCs', value: stats.totalVCs, href: '/vcs' },
         ].map(s => (
           <Link key={s.label} href={s.href} className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-blue-500/50 transition cursor-pointer">
             <p className="text-gray-400 text-xs">{s.label}</p>

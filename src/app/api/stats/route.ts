@@ -25,6 +25,15 @@ export async function GET() {
        ORDER BY CAST(REGEXP_REPLACE(REPLACE(REPLACE(REPLACE(funding_amount, '$', ''), '+', ''), ',', ''), '[^0-9.]', '') AS DECIMAL(20,2)) DESC
        LIMIT 10`
     );
+    // Count unique VCs by parsing comma-separated investors
+    const investorRows = await query<{ investors: string }>(
+      'SELECT investors FROM ai_startups WHERE investors IS NOT NULL AND investors != \'\''
+    );
+    const vcSet = new Set<string>();
+    for (const row of investorRows) {
+      row.investors.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(v => vcSet.add(v));
+    }
+
     const apacCount = await query<{ count: number }>(
       "SELECT COUNT(*) as count FROM ai_startups WHERE region IN ('CN','IN','JP','KR','SG','TH','ID','VN','MY','TW','HK','AU','PH')"
     );
@@ -40,6 +49,7 @@ export async function GET() {
       totalNews: totalNews.count,
       topFunded,
       apacCount: apacCount[0].count,
+      totalVCs: vcSet.size,
     });
   } catch (error) {
     console.error('Stats error:', error);
