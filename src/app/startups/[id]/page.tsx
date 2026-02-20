@@ -58,7 +58,7 @@ export default function StartupDetail() {
               <div><span className="text-gray-400">Stage:</span> <span className="ml-2">{startup.stage || '-'}</span></div>
               <div><span className="text-gray-400">Funding:</span> <span className="ml-2">{startup.funding_amount || '-'}</span></div>
             </div>
-            {startup.website && <a href={startup.website} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block">{startup.website}</a>}
+            {startup.website && <a href={startup.website.startsWith('http') ? startup.website : `https://${startup.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm block">{startup.website}</a>}
           </div>
 
           {/* Tech Stack */}
