@@ -124,6 +124,19 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {/* Quick Links */}
+      <div className="flex flex-wrap justify-center gap-4 pt-4">
+        {[
+          { label: '🔍 Browse All Startups', href: '/startups' },
+          { label: '👥 Key People', href: '/people' },
+          { label: '🏦 VCs & Investors', href: '/vcs' },
+          { label: '📡 RSS Feed', href: '/api/rss' },
+        ].map(link => (
+          <Link key={link.label} href={link.href} className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 text-gray-300 hover:text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
+            {link.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
