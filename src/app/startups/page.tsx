@@ -69,7 +69,7 @@ function StartupsContent() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <input placeholder="Search by name, product, country..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+        <input placeholder="Search by company name..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
           className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 w-64" />
         <select value={region} onChange={e => { setRegion(e.target.value); setPage(1); }}
           className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm">
