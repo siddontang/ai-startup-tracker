@@ -33,7 +33,7 @@ export default function StartupDetail() {
   const techStack = startup.tech_stack ? (typeof startup.tech_stack === 'string' ? startup.tech_stack.split(',') : []) : [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-6">
       <div className="flex justify-between items-center">
         <Link href="/startups" className="text-gray-400 hover:text-white text-sm">← Back to Startups</Link>
         <div className="flex gap-2">

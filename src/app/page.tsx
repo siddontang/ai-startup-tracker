@@ -37,7 +37,7 @@ export default function Dashboard() {
   const dbPercent = stats.totalStartups ? Math.round((stats.needsDatabase / stats.totalStartups) * 100) : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-6">
       <h1 className="text-3xl font-bold">Dashboard</h1>
 
       {/* Stats Cards */}

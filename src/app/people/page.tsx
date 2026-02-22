@@ -48,7 +48,7 @@ function PeopleContent() {
   const SortIcon = ({ col }: { col: string }) => sort === col ? <span>{order === 'ASC' ? ' ↑' : ' ↓'}</span> : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-6">
       <h1 className="text-3xl font-bold">People</h1>
 
       <div className="flex flex-wrap gap-3">
