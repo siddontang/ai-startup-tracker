@@ -78,8 +78,10 @@ function PeopleContent() {
                     <td className="py-3 px-4">
                       {p.startup_id ? (
                         <Link href={`/startups/${p.startup_id}`} className="text-blue-400 hover:underline">{p.startup_name}</Link>
+                      ) : p.startup_name ? (
+                        <a href={`https://www.google.com/search?q=${encodeURIComponent(p.startup_name)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">{p.startup_name} ↗</a>
                       ) : (
-                        <span className="text-gray-400">{p.startup_name}</span>
+                        <span className="text-gray-500">—</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
