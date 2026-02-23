@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const refresh = searchParams.get('refresh') === 'true';
     const cacheKey = `startups:${searchParams.toString()}`;
-    if (!refresh) {
+    const hasSearch = searchParams.has('search') && searchParams.get('search') !== '';
+    if (!refresh && !hasSearch) {
       const cached = getCached(cacheKey);
       if (cached) return NextResponse.json(cached);
     }
