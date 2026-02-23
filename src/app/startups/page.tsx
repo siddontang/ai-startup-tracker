@@ -8,7 +8,19 @@ import { Suspense } from 'react';
 interface Startup {
   id: number; name: string; website: string; region: string; country: string; vertical: string;
   product: string; stage: string; funding_amount: string; needs_database: number; latest_news_at: string;
-  relevance_score: number; outreach_status: string; discovered_at: string;
+  relevance_score: number; outreach_status: string; discovered_at: string; linkedin: string;
+}
+
+function formatFunding(f: string | null): string {
+  if (!f) return '—';
+  // Already formatted (has $ or M or B)
+  if (/[A-Za-z$]/.test(f)) return f;
+  const n = parseFloat(f);
+  if (isNaN(n)) return f;
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(n % 1e9 === 0 ? 0 : 1)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
+  return `$${n}`;
 }
 
 function StartupsContent() {
@@ -96,7 +108,7 @@ function StartupsContent() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="text-gray-400 border-b border-gray-800">
-                {[['name','Name'],['region','Region'],['vertical','Vertical'],['stage','Stage'],['funding_amount','Funding'],['latest_news','Latest News']].map(([col, label]) => (
+                {[['name','Name'],['region','Region'],['vertical','Vertical'],['stage','Stage'],['funding_amount','Funding'],['linkedin','LinkedIn'],['latest_news','Latest News']].map(([col, label]) => (
                   <th key={col} className="text-left py-3 px-4 cursor-pointer hover:text-white" onClick={() => toggleSort(col)}>
                     {label}<SortIcon col={col} />
                   </th>
@@ -109,7 +121,8 @@ function StartupsContent() {
                     <td className="py-3 px-4">{s.region}</td>
                     <td className="py-3 px-4">{s.vertical}</td>
                     <td className="py-3 px-4">{s.stage}</td>
-                    <td className="py-3 px-4 text-gray-400">{s.funding_amount}</td>
+                    <td className="py-3 px-4 text-gray-400">{formatFunding(s.funding_amount)}</td>
+                    <td className="py-3 px-4">{s.linkedin ? <a href={s.linkedin} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-blue-400 hover:text-blue-300">🔗</a> : <span className="text-gray-600">—</span>}</td>
                     <td className="py-3 px-4 text-gray-500 text-xs">{s.latest_news_at ? new Date(s.latest_news_at).toLocaleDateString() : '—'}</td>
                   </tr>
                 ))}
