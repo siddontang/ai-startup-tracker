@@ -61,16 +61,22 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold mb-4">Startups by Region</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={(() => {
-              const top7 = stats.regions.slice(0, 7);
-              const others = stats.regions.slice(7);
-              if (others.length > 0) {
-                const otherCount = others.reduce((sum, r) => sum + r.count, 0);
-                return [...top7, { region: 'Others', count: otherCount }];
+              // Dynamically show enough regions so "Others" stays small
+              let cutoff = 7;
+              while (cutoff < Math.min(stats.regions.length, 15)) {
+                const othersCount = stats.regions.slice(cutoff).reduce((sum: number, r: { count: number }) => sum + r.count, 0);
+                if (othersCount <= (stats.regions[cutoff - 1]?.count ?? 0)) break;
+                cutoff++;
               }
-              return top7;
+              const top = stats.regions.slice(0, cutoff);
+              const others = stats.regions.slice(cutoff);
+              if (others.length > 0) {
+                const otherCount = others.reduce((sum: number, r: { count: number }) => sum + r.count, 0);
+                return [...top, { region: 'Others', count: otherCount }];
+              }
+              return top;
             })()}>
-              <XAxis dataKey="region" stroke="#9ca3af" fontSize={12} />
-              <YAxis stroke="#9ca3af" fontSize={12} />
+              <XAxis dataKey="region" stroke="#9ca3af" fontSize={12} angle={-45} textAnchor="end" height={50} />              <YAxis stroke="#9ca3af" fontSize={12} />
               <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }} />
               <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} className="cursor-pointer" onClick={(_: unknown, index: number) => { const region = stats.regions[index]?.region; if (region) router.push(`/startups?region=${encodeURIComponent(region)}`); }} />
             </BarChart>
