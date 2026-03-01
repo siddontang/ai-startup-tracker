@@ -1,5 +1,13 @@
 'use client';
 
+function formatFunding(amount: string): string {
+  const n = Number(amount);
+  if (!n || isNaN(n)) return amount;
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
+  return `$${n}`;
+}
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -119,7 +127,7 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-500">{s.country} · {s.vertical} · {s.stage}</p>
                   </div>
                 </div>
-                <span className="text-sm font-medium text-green-400">{s.funding_amount}</span>
+                <span className="text-sm font-medium text-green-400">{formatFunding(s.funding_amount)}</span>
               </Link>
             ))}
           </div>
