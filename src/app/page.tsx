@@ -62,12 +62,7 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={(() => {
               // Dynamically show enough regions so "Others" stays small
-              let cutoff = 7;
-              while (cutoff < Math.min(stats.regions.length, 15)) {
-                const othersCount = stats.regions.slice(cutoff).reduce((sum: number, r: { count: number }) => sum + r.count, 0);
-                if (othersCount <= (stats.regions[cutoff - 1]?.count ?? 0)) break;
-                cutoff++;
-              }
+              const cutoff = 10;
               const top = stats.regions.slice(0, cutoff);
               const others = stats.regions.slice(cutoff);
               if (others.length > 0) {
