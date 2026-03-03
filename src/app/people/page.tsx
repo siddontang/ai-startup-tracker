@@ -11,7 +11,7 @@ interface Person {
 }
 
 const SocialLink = ({ href, label }: { href: string; label: string }) =>
-  href ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm bg-gray-800 px-3 py-1 rounded-full">{label}</a> : null;
+  href ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm bg-gray-800 px-3 py-1 rounded-full" title={href}>{label} ↗</a> : null;
 
 function PeopleContent() {
   const searchParams = useSearchParams();
