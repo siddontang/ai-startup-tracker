@@ -56,7 +56,12 @@ export async function GET(request: NextRequest) {
     };
 
     setCache(cacheKey, result);
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Stats error:', error);
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });

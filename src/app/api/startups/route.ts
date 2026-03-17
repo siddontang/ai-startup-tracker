@@ -94,7 +94,12 @@ export async function GET(request: NextRequest) {
 
     const result = { data: rows, total: countResult.count, page, limit };
     setCache(cacheKey, result);
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Startups error:', error);
     return NextResponse.json({ error: 'Failed to fetch startups' }, { status: 500 });
