@@ -29,7 +29,12 @@ export async function GET(request: NextRequest) {
     const conditions: string[] = [];
     const params: unknown[] = [];
 
-    if (search) { const s = search.toLowerCase(); conditions.push('LOWER(s.name) LIKE ?'); params.push(`%${s}%`); }
+    if (search) {
+      const s = search.toLowerCase();
+      // Word-boundary matching: exact name, starts-with, or preceded by space/dash/underscore
+      conditions.push('(LOWER(s.name) = ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ?)');
+      params.push(s, `${s}%`, `% ${s}%`, `%-${s}%`, `%_${s}%`);
+    }
     if (region) { conditions.push('s.region = ?'); params.push(region); }
     if (vertical) { conditions.push('s.vertical = ?'); params.push(vertical); }
     if (stage) { conditions.push('s.stage = ?'); params.push(stage); }
@@ -54,9 +59,27 @@ export async function GET(request: NextRequest) {
     const sortOrder = order === 'ASC' ? 'ASC' : 'DESC';
     const offset = (page - 1) * limit;
 
+    // Count query
     const [countResult] = await query<{ count: number }>(
       `SELECT COUNT(*) as count FROM ai_startups s ${where}`, params
     );
+
+    // When searching, rank results: exact match first, then starts-with, then word-boundary
+    let orderClause: string;
+    let queryParams: unknown[];
+
+    if (search) {
+      const s = search.toLowerCase();
+      orderClause = `CASE
+           WHEN LOWER(s.name) = ? THEN 0
+           WHEN LOWER(s.name) LIKE ? THEN 1
+           ELSE 2
+         END, ${sortCol} ${sortOrder}`;
+      queryParams = [...params, s, `${s}%`, limit, offset];
+    } else {
+      orderClause = `${sortCol} ${sortOrder}`;
+      queryParams = [...params, limit, offset];
+    }
 
     const rows = await query(
       `SELECT s.*, MAX(c.published_at) as latest_news_at
@@ -64,9 +87,9 @@ export async function GET(request: NextRequest) {
        LEFT JOIN company_content c ON s.name = c.startup_name
        ${where}
        GROUP BY s.id
-       ORDER BY ${sortCol} ${sortOrder}
+       ORDER BY ${orderClause}
        LIMIT ? OFFSET ?`,
-      [...params, limit, offset]
+      queryParams
     );
 
     const result = { data: rows, total: countResult.count, page, limit };
