@@ -52,7 +52,8 @@ function StartupsContent() {
     params.set('sort', sort);
     params.set('order', order);
     params.set('page', String(page));
-    const res = await fetch(`/api/startups?${params}`);
+    params.set('_t', String(Date.now()));
+    const res = await fetch(`/api/startups?${params}`, { cache: 'no-store' });
     const json = await res.json();
     setData(json.data || []);
     setTotal(json.total || 0);
@@ -62,7 +63,7 @@ function StartupsContent() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
-    fetch('/api/stats').then(r => r.json()).then(stats => {
+    fetch('/api/stats', { cache: 'no-store' }).then(r => r.json()).then(stats => {
       setRegions((stats.regions || []).map((r: { region: string }) => r.region));
       setVerticals((stats.verticals || []).map((v: { vertical: string }) => v.vertical));
       setStages((stats.stages || []).map((s: { stage: string }) => s.stage));
