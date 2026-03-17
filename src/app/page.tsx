@@ -36,7 +36,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/stats').then(r => r.json()).then(setStats).finally(() => setLoading(false));
+    fetch(`/api/stats?refresh=true&_t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(setStats).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" /></div>;

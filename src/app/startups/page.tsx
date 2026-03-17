@@ -63,7 +63,7 @@ function StartupsContent() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
-    fetch('/api/stats', { cache: 'no-store' }).then(r => r.json()).then(stats => {
+    fetch(`/api/stats?refresh=true&_t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(stats => {
       setRegions((stats.regions || []).map((r: { region: string }) => r.region));
       setVerticals((stats.verticals || []).map((v: { vertical: string }) => v.vertical));
       setStages((stats.stages || []).map((s: { stage: string }) => s.stage));
