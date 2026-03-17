@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -30,6 +30,8 @@ function StartupsContent() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const [region, setRegion] = useState(searchParams.get('region') || '');
   const [vertical, setVertical] = useState(searchParams.get('vertical') || '');
   const [stage, setStage] = useState(searchParams.get('stage') || '');
@@ -81,7 +83,12 @@ function StartupsContent() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <input placeholder="Search by company name..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+        <input placeholder="Search by company name..." value={searchInput} onChange={e => {
+            const v = e.target.value;
+            setSearchInput(v);
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            debounceRef.current = setTimeout(() => { setSearch(v); setPage(1); }, 300);
+          }}
           className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 w-64" />
         <select value={region} onChange={e => { setRegion(e.target.value); setPage(1); }}
           className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm">
