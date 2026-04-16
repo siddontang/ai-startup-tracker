@@ -1,5 +1,27 @@
 'use client';
 
+function normalizeStage(stage: string | null | undefined): string {
+  const raw = (stage || '').trim();
+  if (!raw) return 'Unknown';
+
+  const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (['n/a', 'na', 'n.a.', 'unknown', 'unknown stage', '-', '—', ''].includes(s)) return 'Unknown';
+  if (['seed', 'seed stage'].includes(s)) return 'Seed';
+  if (['pre-seed', 'pre seed', 'preseed'].includes(s)) return 'Pre-Seed';
+  if (['seed/pre-seed', 'pre-seed/seed', 'pre seed/seed'].includes(s)) return 'Seed/Pre-Seed';
+  if (['growth', 'growth stage'].includes(s)) return 'Growth';
+  if (['public', 'ipo', 'listed'].includes(s)) return 'Public';
+  if (['acquired', 'acquisition'].includes(s)) return 'Acquired';
+
+  const seriesMatch = s.match(/^series\s*([a-d])(\+)?$/i) || s.match(/^([a-d])(\+)?$/i);
+  if (seriesMatch) return `Series ${seriesMatch[1].toUpperCase()}${seriesMatch[2] || ''}`;
+
+  return raw
+    .split(/\s+/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 function formatFunding(amount: string): string {
   const n = Number(amount);
   if (!n || isNaN(n)) return amount;
@@ -124,7 +146,7 @@ export default function Dashboard() {
                   <span className="text-gray-500 text-xs w-5">{i + 1}.</span>
                   <div>
                     <p className="text-sm font-medium group-hover:text-blue-400 transition">{s.name}</p>
-                    <p className="text-xs text-gray-500">{s.country} · {s.vertical} · {s.stage}</p>
+                    <p className="text-xs text-gray-500">{s.country} · {s.vertical} · {normalizeStage(s.stage)}</p>
                   </div>
                 </div>
                 <span className="text-sm font-medium text-green-400">{formatFunding(s.funding_amount)}</span>

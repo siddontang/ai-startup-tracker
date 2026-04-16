@@ -1,6 +1,28 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+
+function normalizeStage(stage: string | null | undefined): string {
+  const raw = (stage || '').trim();
+  if (!raw) return 'Unknown';
+
+  const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (['n/a', 'na', 'n.a.', 'unknown', 'unknown stage', '-', '—', ''].includes(s)) return 'Unknown';
+  if (['seed', 'seed stage'].includes(s)) return 'Seed';
+  if (['pre-seed', 'pre seed', 'preseed'].includes(s)) return 'Pre-Seed';
+  if (['seed/pre-seed', 'pre-seed/seed', 'pre seed/seed'].includes(s)) return 'Seed/Pre-Seed';
+  if (['growth', 'growth stage'].includes(s)) return 'Growth';
+  if (['public', 'ipo', 'listed'].includes(s)) return 'Public';
+  if (['acquired', 'acquisition'].includes(s)) return 'Acquired';
+
+  const seriesMatch = s.match(/^series\s*([a-d])(\+)?$/i) || s.match(/^([a-d])(\+)?$/i);
+  if (seriesMatch) return `Series ${seriesMatch[1].toUpperCase()}${seriesMatch[2] || ''}`;
+
+  return raw
+    .split(/\s+/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -128,7 +150,7 @@ function StartupsContent() {
                     <td className="py-3 px-4"><Link href={`/startups/${s.id}`} className="text-blue-400 hover:underline">{s.name}</Link></td>
                     <td className="py-3 px-4">{s.region}</td>
                     <td className="py-3 px-4">{s.vertical}</td>
-                    <td className="py-3 px-4">{s.stage}</td>
+                    <td className="py-3 px-4">{normalizeStage(s.stage)}</td>
                     <td className="py-3 px-4 text-gray-400">{formatFunding(s.funding_amount)}</td>
                     <td className="py-3 px-4">{s.linkedin ? <a href={s.linkedin} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-blue-400 hover:text-blue-300">🔗</a> : <span className="text-gray-600">—</span>}</td>
                     <td className="py-3 px-4 text-gray-500 text-xs">{s.latest_news_at ? new Date(s.latest_news_at).toLocaleDateString() : '—'}</td>
