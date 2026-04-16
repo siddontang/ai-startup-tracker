@@ -13,14 +13,14 @@ function normalizeStage(stage: string | null | undefined): string {
   if (['n/a', 'na', 'n.a.', 'unknown', 'unknown stage', '-', '—', ''].includes(s)) return 'Unknown';
   if (['acquired', 'acquisition'].includes(s)) return 'Acquired';
   if (['public', 'ipo', 'listed'].includes(s)) return 'Public';
-  if (['growth', 'growth stage', 'series c', 'series d', 'series d+', 'c', 'd', 'd+'].includes(s)) return 'Growth+';
+  if (['growth', 'growth stage', 'series c', 'series d', 'series d+', 'c', 'd', 'd+'].includes(s)) return 'Late Stage';
   if (['seed', 'seed stage', 'pre-seed', 'pre seed', 'preseed', 'seed/pre-seed', 'pre-seed/seed', 'pre seed/seed'].includes(s)) return 'Seed';
 
   const seriesMatch = s.match(/^series\s*([a-d])(\+)?$/i) || s.match(/^([a-d])(\+)?$/i);
   if (seriesMatch) {
     const letter = seriesMatch[1].toUpperCase();
     if (letter === 'A' || letter === 'B') return `Series ${letter}`;
-    return 'Growth+';
+    return 'Late Stage';
   }
 
   return 'Unknown';
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       const normalized = normalizeStage(row.stage);
       stageMap.set(normalized, (stageMap.get(normalized) || 0) + Number(row.count || 0));
     }
-    const stageOrder = ['Seed', 'Series A', 'Series B', 'Growth+', 'Public', 'Acquired', 'Unknown'];
+    const stageOrder = ['Seed', 'Series A', 'Series B', 'Late Stage', 'Public', 'Acquired', 'Unknown'];
     const stages = Array.from(stageMap.entries())
       .map(([stage, count]) => ({ stage, count }))
       .sort((a, b) => {
