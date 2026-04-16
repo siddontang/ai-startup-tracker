@@ -8,20 +8,19 @@ function normalizeStage(stage: string | null | undefined): string {
 
   const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
   if (['n/a', 'na', 'n.a.', 'unknown', 'unknown stage', '-', '—', ''].includes(s)) return 'Unknown';
-  if (['seed', 'seed stage'].includes(s)) return 'Seed';
-  if (['pre-seed', 'pre seed', 'preseed'].includes(s)) return 'Pre-Seed';
-  if (['seed/pre-seed', 'pre-seed/seed', 'pre seed/seed'].includes(s)) return 'Seed/Pre-Seed';
-  if (['growth', 'growth stage'].includes(s)) return 'Growth';
-  if (['public', 'ipo', 'listed'].includes(s)) return 'Public';
   if (['acquired', 'acquisition'].includes(s)) return 'Acquired';
+  if (['public', 'ipo', 'listed'].includes(s)) return 'Public';
+  if (['growth', 'growth stage', 'series c', 'series d', 'series d+', 'c', 'd', 'd+'].includes(s)) return 'Growth+';
+  if (['seed', 'seed stage', 'pre-seed', 'pre seed', 'preseed', 'seed/pre-seed', 'pre-seed/seed', 'pre seed/seed'].includes(s)) return 'Seed';
 
   const seriesMatch = s.match(/^series\s*([a-d])(\+)?$/i) || s.match(/^([a-d])(\+)?$/i);
-  if (seriesMatch) return `Series ${seriesMatch[1].toUpperCase()}${seriesMatch[2] || ''}`;
+  if (seriesMatch) {
+    const letter = seriesMatch[1].toUpperCase();
+    if (letter === 'A' || letter === 'B') return `Series ${letter}`;
+    return 'Growth+';
+  }
 
-  return raw
-    .split(/\s+/)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(' ');
+  return 'Unknown';
 }
 
 function normalizeVertical(vertical: string | null | undefined): string {
