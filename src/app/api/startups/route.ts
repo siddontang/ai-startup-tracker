@@ -26,12 +26,12 @@ export async function GET(request: NextRequest) {
     const minRelevance = searchParams.get('min_relevance');
     const maxRelevance = searchParams.get('max_relevance');
 
-    const conditions: string[] = [];
+    const conditions: string[] = ["COALESCE(s.outreach_status, 'new') != 'noise'"];
     const params: unknown[] = [];
 
     if (search) {
       const s = search.toLowerCase();
-      // Word-boundary matching: exact name, starts-with, or preceded by space/dash/underscore
+      // Company name only, exact/starts-with/word boundary matching
       conditions.push('(LOWER(s.name) = ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ? OR LOWER(s.name) LIKE ?)');
       params.push(s, `${s}%`, `% ${s}%`, `%-${s}%`, `%_${s}%`);
     }

@@ -14,28 +14,31 @@ export async function GET(request: NextRequest) {
       if (cached) return NextResponse.json(cached);
     }
 
-    const [total] = await query<{ count: number }>('SELECT COUNT(*) as count FROM ai_startups');
+    const baseWhere = "WHERE COALESCE(outreach_status, 'new') != 'noise'";
+
+    const [total] = await query<{ count: number }>(`SELECT COUNT(*) as count FROM ai_startups ${baseWhere}`);
     const regions = await query<{ region: string; count: number }>(
-      'SELECT region, COUNT(*) as count FROM ai_startups GROUP BY region ORDER BY count DESC'
+      `SELECT region, COUNT(*) as count FROM ai_startups ${baseWhere} GROUP BY region ORDER BY count DESC`
     );
-    const [avg] = await query<{ avg: number }>('SELECT AVG(relevance_score) as avg FROM ai_startups');
+    const [avg] = await query<{ avg: number }>(`SELECT AVG(relevance_score) as avg FROM ai_startups ${baseWhere}`);
     const verticals = await query<{ vertical: string; count: number }>(
-      'SELECT vertical, COUNT(*) as count FROM ai_startups WHERE vertical IS NOT NULL GROUP BY vertical ORDER BY count DESC'
+      `SELECT vertical, COUNT(*) as count FROM ai_startups ${baseWhere} AND vertical IS NOT NULL GROUP BY vertical ORDER BY count DESC`
     );
     const stages = await query<{ stage: string; count: number }>(
-      'SELECT stage, COUNT(*) as count FROM ai_startups WHERE stage IS NOT NULL GROUP BY stage ORDER BY count DESC'
+      `SELECT stage, COUNT(*) as count FROM ai_startups ${baseWhere} AND stage IS NOT NULL GROUP BY stage ORDER BY count DESC`
     );
-    const [needsDbCount] = await query<{ count: number }>('SELECT COUNT(*) as count FROM ai_startups WHERE needs_database = 1');
+    const [needsDbCount] = await query<{ count: number }>(`SELECT COUNT(*) as count FROM ai_startups ${baseWhere} AND needs_database = 1`);
     const [totalPersons] = await query<{ count: number }>('SELECT COUNT(*) as count FROM key_persons');
     const [totalNews] = await query<{ count: number }>('SELECT COUNT(*) as count FROM company_content');
     const topFunded = await query(
       `SELECT id, name, country, vertical, funding_amount, stage FROM ai_startups 
-       WHERE funding_amount IS NOT NULL AND funding_amount != '' AND funding_amount != 'N/A'
+       WHERE COALESCE(outreach_status, 'new') != 'noise'
+         AND funding_amount IS NOT NULL AND funding_amount != '' AND funding_amount != 'N/A'
        ORDER BY CAST(REGEXP_REPLACE(REPLACE(REPLACE(REPLACE(funding_amount, '$', ''), '+', ''), ',', ''), '[^0-9.]', '') AS DECIMAL(20,2)) DESC
        LIMIT 10`
     );
     const investorRows = await query<{ investors: string }>(
-      'SELECT investors FROM ai_startups WHERE investors IS NOT NULL AND investors != \'\''
+      "SELECT investors FROM ai_startups WHERE COALESCE(outreach_status, 'new') != 'noise' AND investors IS NOT NULL AND investors != ''"
     );
     const vcSet = new Set<string>();
     for (const row of investorRows) {
