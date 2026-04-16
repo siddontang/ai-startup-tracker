@@ -29,6 +29,34 @@ function normalizeStage(stage: string | null | undefined): string {
     .join(' ');
 }
 
+function normalizeVertical(vertical: string | null | undefined): string {
+  const raw = (vertical || '').trim();
+  if (!raw) return 'Other';
+
+  const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
+
+  if (['llm-infra', 'llm infra', 'foundation model infra', 'model infra'].includes(s)) return 'LLM Infrastructure';
+  if (['ai infrastructure', 'infrastructure ai', 'infra', 'ai infra'].includes(s)) return 'AI Infrastructure';
+  if (['agents', 'agent', 'agentic ai', 'agentic'].includes(s)) return 'Agents';
+  if (['ai/ml', 'ml', 'machine learning', 'artificial intelligence'].includes(s)) return 'AI/ML';
+  if (['enterprise ai', 'enterprise automation ai', 'enterprise agent'].includes(s)) return 'Enterprise AI';
+  if (['ai application - horizontal', 'horizontal ai', 'ai apps', 'application ai'].includes(s)) return 'AI Applications';
+  if (['dev-tools', 'developer tools', 'ai developer tools', 'coding'].includes(s)) return 'Developer Tools';
+  if (['data-platform', 'data platform', 'rag', 'retrieval', 'search'].includes(s)) return 'Data Platforms';
+  if (['cv', 'computer vision', 'vision', 'video ai'].includes(s)) return 'Computer Vision';
+  if (['nlp', 'language', 'text ai'].includes(s)) return 'NLP';
+
+  // industry labels should not dominate product taxonomy, fold them into applications
+  if (['fintech', 'healthcare', 'edtech', 'legaltech', 'ecommerce', 'retail', 'sales', 'marketing'].includes(s)) return 'AI Applications';
+
+  if (['other', 'misc', 'general'].includes(s)) return 'Other';
+
+  return raw
+    .split(/\s+/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export async function GET(request: NextRequest) {
   try {
     const refresh = request.nextUrl.searchParams.get('refresh') === 'true';
@@ -46,9 +74,25 @@ export async function GET(request: NextRequest) {
       `SELECT region, COUNT(*) as count FROM ai_startups ${baseWhere} GROUP BY region ORDER BY count DESC`
     );
     const [avg] = await query<{ avg: number }>(`SELECT AVG(relevance_score) as avg FROM ai_startups ${baseWhere}`);
-    const verticals = await query<{ vertical: string; count: number }>(
+    const rawVerticals = await query<{ vertical: string; count: number }>(
       `SELECT vertical, COUNT(*) as count FROM ai_startups ${baseWhere} AND vertical IS NOT NULL GROUP BY vertical ORDER BY count DESC`
     );
+    const verticalMap = new Map<string, number>();
+    for (const row of rawVerticals) {
+      const normalized = normalizeVertical(row.vertical);
+      verticalMap.set(normalized, (verticalMap.get(normalized) || 0) + Number(row.count || 0));
+    }
+    const verticalOrder = ['AI Applications', 'Agents', 'LLM Infrastructure', 'AI Infrastructure', 'Enterprise AI', 'AI/ML', 'Data Platforms', 'Developer Tools', 'Computer Vision', 'NLP', 'Other'];
+    const verticals = Array.from(verticalMap.entries())
+      .map(([vertical, count]) => ({ vertical, count }))
+      .sort((a, b) => {
+        const ai = verticalOrder.indexOf(a.vertical);
+        const bi = verticalOrder.indexOf(b.vertical);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return b.count - a.count;
+      });
     const rawStages = await query<{ stage: string; count: number }>(
       `SELECT stage, COUNT(*) as count FROM ai_startups ${baseWhere} AND stage IS NOT NULL GROUP BY stage ORDER BY count DESC`
     );

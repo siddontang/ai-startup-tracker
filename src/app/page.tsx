@@ -22,6 +22,30 @@ function normalizeStage(stage: string | null | undefined): string {
     .join(' ');
 }
 
+function normalizeVertical(vertical: string | null | undefined): string {
+  const raw = (vertical || '').trim();
+  if (!raw) return 'Other';
+
+  const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (['llm-infra', 'llm infra', 'foundation model infra', 'model infra'].includes(s)) return 'LLM Infrastructure';
+  if (['ai infrastructure', 'infrastructure ai', 'infra', 'ai infra'].includes(s)) return 'AI Infrastructure';
+  if (['agents', 'agent', 'agentic ai', 'agentic'].includes(s)) return 'Agents';
+  if (['ai/ml', 'ml', 'machine learning', 'artificial intelligence'].includes(s)) return 'AI/ML';
+  if (['enterprise ai', 'enterprise automation ai', 'enterprise agent'].includes(s)) return 'Enterprise AI';
+  if (['ai application - horizontal', 'horizontal ai', 'ai apps', 'application ai'].includes(s)) return 'AI Applications';
+  if (['dev-tools', 'developer tools', 'ai developer tools', 'coding'].includes(s)) return 'Developer Tools';
+  if (['data-platform', 'data platform', 'rag', 'retrieval', 'search'].includes(s)) return 'Data Platforms';
+  if (['cv', 'computer vision', 'vision', 'video ai'].includes(s)) return 'Computer Vision';
+  if (['nlp', 'language', 'text ai'].includes(s)) return 'NLP';
+  if (['fintech', 'healthcare', 'edtech', 'legaltech', 'ecommerce', 'retail', 'sales', 'marketing'].includes(s)) return 'AI Applications';
+  if (['other', 'misc', 'general'].includes(s)) return 'Other';
+
+  return raw
+    .split(/\s+/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
+
 function formatFunding(amount: string): string {
   const n = Number(amount);
   if (!n || isNaN(n)) return amount;
@@ -146,7 +170,7 @@ export default function Dashboard() {
                   <span className="text-gray-500 text-xs w-5">{i + 1}.</span>
                   <div>
                     <p className="text-sm font-medium group-hover:text-blue-400 transition">{s.name}</p>
-                    <p className="text-xs text-gray-500">{s.country} · {s.vertical} · {normalizeStage(s.stage)}</p>
+                    <p className="text-xs text-gray-500">{s.country} · {normalizeVertical(s.vertical)} · {normalizeStage(s.stage)}</p>
                   </div>
                 </div>
                 <span className="text-sm font-medium text-green-400">{formatFunding(s.funding_amount)}</span>

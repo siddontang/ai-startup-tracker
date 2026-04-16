@@ -23,6 +23,30 @@ function normalizeStage(stage: string | null | undefined): string {
     .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(' ');
 }
+
+function normalizeVertical(vertical: string | null | undefined): string {
+  const raw = (vertical || '').trim();
+  if (!raw) return 'Other';
+
+  const s = raw.toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (['llm-infra', 'llm infra', 'foundation model infra', 'model infra'].includes(s)) return 'LLM Infrastructure';
+  if (['ai infrastructure', 'infrastructure ai', 'infra', 'ai infra'].includes(s)) return 'AI Infrastructure';
+  if (['agents', 'agent', 'agentic ai', 'agentic'].includes(s)) return 'Agents';
+  if (['ai/ml', 'ml', 'machine learning', 'artificial intelligence'].includes(s)) return 'AI/ML';
+  if (['enterprise ai', 'enterprise automation ai', 'enterprise agent'].includes(s)) return 'Enterprise AI';
+  if (['ai application - horizontal', 'horizontal ai', 'ai apps', 'application ai'].includes(s)) return 'AI Applications';
+  if (['dev-tools', 'developer tools', 'ai developer tools', 'coding'].includes(s)) return 'Developer Tools';
+  if (['data-platform', 'data platform', 'rag', 'retrieval', 'search'].includes(s)) return 'Data Platforms';
+  if (['cv', 'computer vision', 'vision', 'video ai'].includes(s)) return 'Computer Vision';
+  if (['nlp', 'language', 'text ai'].includes(s)) return 'NLP';
+  if (['fintech', 'healthcare', 'edtech', 'legaltech', 'ecommerce', 'retail', 'sales', 'marketing'].includes(s)) return 'AI Applications';
+  if (['other', 'misc', 'general'].includes(s)) return 'Other';
+
+  return raw
+    .split(/\s+/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+}
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -149,7 +173,7 @@ function StartupsContent() {
                   <tr key={s.id} className="border-b border-gray-800/50 hover:bg-gray-800/50 cursor-pointer" onClick={() => router.push(`/startups/${s.id}`)}>
                     <td className="py-3 px-4"><Link href={`/startups/${s.id}`} className="text-blue-400 hover:underline">{s.name}</Link></td>
                     <td className="py-3 px-4">{s.region}</td>
-                    <td className="py-3 px-4">{s.vertical}</td>
+                    <td className="py-3 px-4">{normalizeVertical(s.vertical)}</td>
                     <td className="py-3 px-4">{normalizeStage(s.stage)}</td>
                     <td className="py-3 px-4 text-gray-400">{formatFunding(s.funding_amount)}</td>
                     <td className="py-3 px-4">{s.linkedin ? <a href={s.linkedin} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-blue-400 hover:text-blue-300">🔗</a> : <span className="text-gray-600">—</span>}</td>
